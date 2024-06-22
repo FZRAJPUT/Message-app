@@ -24,6 +24,55 @@
 
 
     <script src="/socket.io/socket.io.js"></script>
-    <script src="/client.js"></script>
+    <script src="/client.js">
+    const socket = io();
+
+let namee;
+let textArea = document.getElementById('txt_area');
+let messageArea = document.getElementsByClassName('message_area')[0];
+
+do {
+    namee = prompt("Please Enter your name");
+} while (!namee);
+
+textArea.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && e.target.value.trim()) {
+        sendMessage(e.target.value.trim());
+        // textarea.value = '';
+        e.target.value = '';
+    }
+});
+
+function sendMessage(message) {
+    let msg = {
+        user: namee,
+        message: message.trim()
+    };
+
+    appendMessage(msg, 'outgoing');
+
+    socket.emit('message', msg);
+}
+
+function appendMessage(msg, type) {
+    let mainDiv = document.createElement('div');
+    mainDiv.classList.add(type, 'message');
+
+    let markUp = `
+    <h4>${msg.user}</h4>
+    <p>${msg.message}</p>
+    `;
+
+    mainDiv.innerHTML = markUp;
+    messageArea.appendChild(mainDiv);
+
+    messageArea.scrollTop = messageArea.scrollHeight;
+}
+
+socket.on('message', (msg) => {
+    appendMessage(msg, 'incoming');
+});
+
+</script>
 </body>
 </html>
